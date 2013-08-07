@@ -108,13 +108,14 @@ public class ExecutionEngine<T extends Serializable> {
      */
     public ExecutionEngine(Executor<T> executor, boolean isAutoStart, boolean isAutoRestart,
                            long callDelay) throws QueueException {
-
-        this.executor = executor;
+	this(executor,isAutoStart,isAutoRestart,callDelay,-1);
+       
+       /*this.executor = executor;
         this.callDelay = callDelay;
         this.isAutoRestart = isAutoRestart;
         if (isAutoStart) {
             startEngine();
-        }
+        }*/
 
     }
 
@@ -129,12 +130,13 @@ public class ExecutionEngine<T extends Serializable> {
     public ExecutionEngine(Executor<T> executor, boolean isAutoStart, boolean isAutoRestart,
                            int queueLength) throws QueueException {
 
-        this.synchQueue = new SynchQueue<T>(queueLength);
+	this(executor,isAutoStart,isAutoRestart,0,queueLength);
+        /*this.synchQueue = new SynchQueue<T>(queueLength);
         this.executor = executor;
         this.isAutoRestart = isAutoRestart;
         if (isAutoStart) {
             startEngine();
-        }
+        }*/
 
     }
 
@@ -148,12 +150,13 @@ public class ExecutionEngine<T extends Serializable> {
     public ExecutionEngine(Executor<T> executor, boolean isAutoStart, boolean isAutoRestart)
             throws QueueException {
 
-        this.synchQueue = new SynchQueue<T>();
+	this(executor,isAutoStart,isAutoRestart,0,-1);
+        /*this.synchQueue = new SynchQueue<T>();
         this.executor = executor;
         this.isAutoRestart = isAutoRestart;
         if (isAutoStart) {
             startEngine();
-        }
+        }*/
 
     }
 
@@ -196,13 +199,20 @@ public class ExecutionEngine<T extends Serializable> {
      */
     public synchronized void startEngine() throws QueueException {
         try {
-            if (this.queueProcessor == null) {
+            /*if (this.queueProcessor == null) {
                 this.queueProcessor = new QueueProcessor<T>(this);
             }
             if (!this.queueProcessor.isAlive()) {
                 this.queueProcessor = new QueueProcessor<T>(this);
                 this.queueProcessor.start();
+            }*/
+            if (this.queueProcessor != null && this.queueProcessor.isAlive()) {
+            	return;
             }
+            
+            this.queueProcessor = new QueueProcessor<T>(this);
+            this.queueProcessor.start();
+            
         } catch (Exception e) {
             String errorMsg = "Error occured when starting the execution thread, " + e.getMessage();
             log.error(errorMsg, e);
