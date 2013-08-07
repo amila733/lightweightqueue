@@ -101,20 +101,21 @@ public class SynchQueue<T extends Serializable> {
 
         boolean isAdded = false;
         if (t != null) {
-            if (this.queue.size() == getQueueLength()) {
-                String warnMsg =
-                        "Maximum limit of the queue is exceeded. Please try again with in few seconds.";
-                log.warn(warnMsg);
-                throw new QueueException(warnMsg);
-            }
-
-            this.queue.add(t);
-
             synchronized (this.queue) {
-                this.queue.notifyAll();
+	            if (this.queue.size() == getQueueLength()) {
+	                String warnMsg =
+	                        "Maximum limit of the queue is exceeded. Please try again with in few seconds.";
+	                log.warn(warnMsg);
+	                throw new QueueException(warnMsg);
+	            }
+	
+	            isAdded=this.queue.add(t);
+
+            
+                this.queue.notify();
             }
 
-            isAdded = true;
+            //isAdded = true;
             String infoMsg =
                     "Element was added to the queue successfully. Element Info : " +
                     t.toString();
